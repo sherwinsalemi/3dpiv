@@ -1,7 +1,13 @@
 mkdir -p bin
-if g++ src/*.cpp -I/usr/include/opencv4 -luvc -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -obin/3dpiv; then 
-echo "Build succeeded";
-sudo bin/3dpiv
+
+# if [ $OSTYPE == "msys" ]; then
+if clang++ src/*.cc src/*.c -Iinc -Llib -lSDL2 -obin/3dpiv.exe -Wno-deprecated; then 
+	echo "Build succeeded";
+	exit 0;
 else 
-echo "Build failed"; 
+	echo "Build failed"; 
+	exit 1;
 fi
+
+
+
