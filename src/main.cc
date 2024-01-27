@@ -110,6 +110,8 @@ int main()
 		5*sizeof(float),
 		(void*)(3*sizeof(float)));
 
+	initPipeline();
+
 	int64_t lastTicks = -5000;
 	bool running = true;
 	while (running)
@@ -140,18 +142,18 @@ int main()
 				processed.width = width;
 				processed.height = height;
 
-				raw.data = (unsigned char*)malloc(width*height*sizeof(char)*3);
-				processed.data = (unsigned char*)malloc(width*height*sizeof(char)*3);
+				initFrame(&processed);
+				zeroFrame(&processed);
 
-				memcpy(raw.data, img, width*height*sizeof(char)*3);
+				copyFrame(img, &raw);
 
 				processFrame(raw, &processed);
 
 				texture.Set(width, height, processed.data);
 				stbi_image_free(img);
 
-				free(raw.data);
-				free(processed.data);
+				freeFrame(&raw);
+				freeFrame(&processed);
 
 				//printf("%d, %d, %d\n", width,height,channels);
 
@@ -172,6 +174,8 @@ int main()
 
 		SDL_GL_SwapWindow(window);
 	}
+
+	freePipeline();
 
 
 	FreeShader(&shader);
