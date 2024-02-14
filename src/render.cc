@@ -7,6 +7,8 @@
 
 #include "glad/glad.h"
 
+#include "SDL/SDL_events.h"
+
 char* LoadString(const char* path)
 {
 	FILE* f = fopen(path, "rb");

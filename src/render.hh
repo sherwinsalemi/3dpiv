@@ -2,7 +2,12 @@
 
 #include "core.hh"
 
+#include "SDL/SDL.h"
+
 char* LoadString(const char* path);
+
+void InitRender(SDL_Window* window, SDL_GLContext context, int width, int height);
+void FreeRender(SDL_Window* window, SDL_GLContext context);
 
 enum ShaderType
 {

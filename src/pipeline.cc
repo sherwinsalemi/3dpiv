@@ -5,11 +5,16 @@
 #include <stdio.h>
 #include <math.h>
 
+#include "settings.hh"
+
 Image last;
 Image derivative;
 
+Image persistentOut;
+
 void initPipeline()
 {
+	printf("init\n");
 	last.width = 1920;
 	last.height = 1080;
 	initFrame(&last);
@@ -23,6 +28,7 @@ void initPipeline()
 
 void processFrame(Image in, Image* out)
 {
+	printf("proc\n");
 	printf("Size: %d, %d\n", in.width, in.height);
 
 	zeroFrame(&derivative);
@@ -39,7 +45,7 @@ void processFrame(Image in, Image* out)
 			pix((derivative), x, y, GRN) = pixel;
 
 
-			//pix((*out), x, y, BLU) = pix((in), x, y, RED) / 3;
+			pix((*out), x, y, BLU) = pix((in), x, y, RED) / 3;
 		}
 	}
 
@@ -62,7 +68,6 @@ void processFrame(Image in, Image* out)
 
 
 	copyFrame(&in, &last, false);
-
 }
 
 void freePipeline()

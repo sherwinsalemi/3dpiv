@@ -27,3 +27,11 @@ void freePipeline();
 unsigned char CLAMP(unsigned char in, unsigned char low, unsigned char high);
 i32 CLAMP(i32 in, i32 low, i32 high);
 u32 CLAMP(u32 in, u32 low, u32 high);
+
+unsigned char MAX(unsigned char a, unsigned char b);
+unsigned char MIN(unsigned char a, unsigned char b);
+i32 MAX(i32 a, i32 b);
+i32 MIN(i32 a, i32 b);
+u32 MAX(u32 a, u32 b);
+u32 MIN(u32 a, u32 b);
+
