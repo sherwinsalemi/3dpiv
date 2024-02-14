@@ -41,11 +41,7 @@ SDL_GLContext context;
 
 int main()
 {
-<<<<<<< HEAD
 	SDL_Init(SDL_INIT_EVERYTHING);
-=======
-    SDL_Init(SDL_INIT_EVERYTHING);
->>>>>>> 55426bd3e673441e776b1d55cd9ac1d3df8be22c
 	SDL_Window* window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 	
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
@@ -81,20 +77,11 @@ int main()
 	char fileName[32];
 	unsigned char* img;
 
-<<<<<<< HEAD
-=======
-	printf("1\n");
-
->>>>>>> 55426bd3e673441e776b1d55cd9ac1d3df8be22c
 	u32 vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-<<<<<<< HEAD
 	img = stbi_load("res/phone/%04d.png", &width, &height, &channels, 3);
-=======
-	img = stbi_load("res/slowmo/0001.png", &width, &height, &channels, 3);
->>>>>>> 55426bd3e673441e776b1d55cd9ac1d3df8be22c
 	Texture texture;
 	texture.Gen();
 	texture.Set(width, height, img);

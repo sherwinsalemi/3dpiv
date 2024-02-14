@@ -14,16 +14,10 @@ Image persistentOut;
 
 void initPipeline()
 {
-<<<<<<< HEAD
-	printf("init\n");
-	last.width = 1920;
-	last.height = 1080;
-=======
 	
 	printf("init\n");
 	last.width = WIDTH;
 	last.height = HEIGHT;
->>>>>>> 55426bd3e673441e776b1d55cd9ac1d3df8be22c
 	initFrame(&last);
 
 	derivative.width = WIDTH;
