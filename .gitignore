@@ -1,5 +1,7 @@
 res/*
 *.png
 *.mp4
+*.bmp
+*.avi
 bin/3dpiv
 bin/3dpiv.exe
