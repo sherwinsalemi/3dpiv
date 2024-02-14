@@ -42,7 +42,7 @@ SDL_GLContext context;
 int main()
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Window* window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH/2, HEIGHT/2, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 	
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
@@ -71,7 +71,7 @@ int main()
     glGetIntegerv(GL_MINOR_VERSION, &min);
     SDL_Log("Context  : %d.%d", maj, min);
 
-	int frameNumber = 57;
+	int frameNumber = 1;
 
 	int width,height,channels;
 	char fileName[32];
@@ -81,7 +81,8 @@ int main()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	img = stbi_load("res/phone/%04d.png", &width, &height, &channels, 3);
+	img = stbi_load(PATH, &width, &height, &channels, 3);
+
 	Texture texture;
 	texture.Gen();
 	texture.Set(width, height, img);
@@ -145,7 +146,7 @@ int main()
 			{
 				frameNumber++;
 				
-				sprintf(fileName, "res/phone/%04d.png", frameNumber);
+				sprintf(fileName, PATH, frameNumber);
 				
 				//printf("Loaded %s\n", fileName);
 				img = stbi_load(fileName, &width, &height, &channels, 3);
