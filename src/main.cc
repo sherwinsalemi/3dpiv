@@ -31,7 +31,7 @@ u32 iboData[] = {
 int main()
 {
     SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Window* window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 	
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
@@ -60,23 +60,25 @@ int main()
     glGetIntegerv(GL_MINOR_VERSION, &min);
     SDL_Log("Context  : %d.%d", maj, min);
 
-	int frameNumber = 1;
+	int frameNumber = 57;
 
 	int width,height,channels;
 	char fileName[32];
 	unsigned char* img;
 
-	
+	printf("1\n");
 
 	u32 vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	img = stbi_load("res/0001.png", &width, &height, &channels, 3);
+	img = stbi_load("res/slowmo/0001.png", &width, &height, &channels, 3);
 	Texture texture;
 	texture.Gen();
 	texture.Set(width, height, img);
 	stbi_image_free(img);
+	
+	printf("1\n");
 
 	char* fragmentSource = LoadString("fragment.glsl");
 	char* vertexSource = LoadString("vertex.glsl");
@@ -111,8 +113,9 @@ int main()
 		(void*)(3*sizeof(float)));
 
 	initPipeline();
+	
 
-	int64_t lastTicks = -5000;
+	int64_t lastTicks = -1;
 	bool running = true;
 	while (running)
 	{
@@ -127,10 +130,13 @@ int main()
 			}
 		}
 
-		if (SDL_GetTicks64() - lastTicks > 10)
+		
+	printf("1\n");
+
+		if (SDL_GetTicks64() - lastTicks > 100 && frameNumber < 75)
 		{
 			{
-				sprintf(fileName, "res/%04d.png", frameNumber);
+				sprintf(fileName, "res/slowmo/%04d.png", frameNumber);
 				//printf("Loaded %s\n", fileName);
 				img = stbi_load(fileName, &width, &height, &channels, 3);
 
@@ -162,6 +168,7 @@ int main()
 
 			lastTicks = SDL_GetTicks64();
 		}
+
 
 		shader.Bind();
 
