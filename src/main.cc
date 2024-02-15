@@ -9,13 +9,13 @@
 
 #include <glad/glad.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+
 
 #include "core.hh"
 #include "render.hh"
 #include "cv.hh"
 #include "settings.hh"
+#include "frameloader.hh"
 
 float vboData[] = {
 	-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
@@ -36,57 +36,24 @@ float testArrowVBO[] = {
 	1.0f, -1.0f, 1.0f, 1.0f, 1.0f
 };
 
-SDL_Window* window;
-SDL_GLContext context;
+Renderer r;
 
 int main()
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Window* window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH/2, HEIGHT/2, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+	InitRenderer(&r);
 	
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY );
-
-	
-	SDL_GLContext context;
-	context = SDL_GL_CreateContext(window);
-
-	if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
-	{
-		printf("Failed to load GLAD\n");
-	}
-
-	SDL_Log("Vendor   : %s", glGetString(GL_VENDOR));
-    SDL_Log("Renderer : %s", glGetString(GL_RENDERER));
-    SDL_Log("Version  : %s", glGetString(GL_VERSION));
-    SDL_Log("GLSL     : %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
-    int maj;
-    int min;
-    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &maj);
-    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &min);
-    SDL_Log("Context  : %d.%d", maj, min);
-
-    glGetIntegerv(GL_MAJOR_VERSION, &maj);
-    glGetIntegerv(GL_MINOR_VERSION, &min);
-    SDL_Log("Context  : %d.%d", maj, min);
-
 	int frameNumber = 1;
-
-	int width,height,channels;
-	char fileName[32];
-	unsigned char* img;
 
 	u32 vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	img = stbi_load(PATH, &width, &height, &channels, 3);
-
-	Texture texture;
+	
+	Image img = loadImage(PATH, 1);
+	Texture texture; // opengl texture
 	texture.Gen();
 	texture.Set(width, height, img);
-	stbi_image_free(img);
+	
 	
 	printf("1\n");
 
@@ -146,7 +113,7 @@ int main()
 			{
 				frameNumber++;
 				
-				sprintf(fileName, PATH, frameNumber);
+				
 				
 				//printf("Loaded %s\n", fileName);
 				img = stbi_load(fileName, &width, &height, &channels, 3);
@@ -189,14 +156,13 @@ int main()
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		SDL_GL_SwapWindow(window);
+		SDL_GL_SwapWindow(r.window);
 	}
 
-	freePipeline();
 	FreeShader(&shader);
+	FreeRenderer(&r);
 
-	SDL_GL_DeleteContext(context);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
+	freePipeline();
+	
     return 0;
 }

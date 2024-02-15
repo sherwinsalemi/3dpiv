@@ -2,12 +2,22 @@
 
 #include "core.hh"
 
-#include "SDL/SDL.h"
+typedef struct SDL_Window SDL_Window;
+typedef void *SDL_GLContext;
 
 char* LoadString(const char* path);
 
 void InitRender(SDL_Window* window, SDL_GLContext context, int width, int height);
 void FreeRender(SDL_Window* window, SDL_GLContext context);
+
+struct Renderer
+{
+	SDL_Window* window;
+	SDL_GLContext context;
+};
+
+void InitRenderer(Renderer* r);
+void FreeRenderer(Renderer* r);
 
 enum ShaderType
 {

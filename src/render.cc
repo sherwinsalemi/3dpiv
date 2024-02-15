@@ -1,12 +1,14 @@
 #include "render.hh"
 
 #include "core.hh"
+#include "settings.hh"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "glad/glad.h"
 
+#include "SDL/SDL.h"
 #include "SDL/SDL_events.h"
 
 char* LoadString(const char* path)
@@ -21,6 +23,49 @@ char* LoadString(const char* path)
 	fread(buf, 1, size, f);
 	return buf;
 }
+
+void InitRenderer(Renderer* r)
+{
+	SDL_Init(SDL_INIT_EVERYTHING);
+	r->window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH/2, HEIGHT/2, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+	
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY );
+
+	r->context = SDL_GL_CreateContext(r->window);
+
+	if (!gladLoadGLLoader(SDL_GL_GetProcAddress))
+	{
+		printf("Failed to load GLAD\n");
+	}
+
+	SDL_Log("Vendor   : %s", glGetString(GL_VENDOR));
+    SDL_Log("Renderer : %s", glGetString(GL_RENDERER));
+    SDL_Log("Version  : %s", glGetString(GL_VERSION));
+    SDL_Log("GLSL     : %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    int maj;
+    int min;
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &maj);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &min);
+    SDL_Log("Context  : %d.%d", maj, min);
+
+    glGetIntegerv(GL_MAJOR_VERSION, &maj);
+    glGetIntegerv(GL_MINOR_VERSION, &min);
+    SDL_Log("Context  : %d.%d", maj, min);
+}
+
+void FreeRenderer(Renderer* r)
+{
+	
+
+	SDL_GL_DeleteContext(r->context);
+	SDL_DestroyWindow(r->window);
+	SDL_Quit();
+}
+
+
+
 
 Shader CreateShader()
 {
