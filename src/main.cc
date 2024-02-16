@@ -49,10 +49,8 @@ int main()
 	glBindVertexArray(vao);
 
 	
-	Image img = loadImage(PATH, 1);
 	Texture texture; // opengl texture
 	texture.Gen();
-	texture.Set(width, height, img);
 	
 	
 	printf("1\n");
@@ -107,40 +105,33 @@ int main()
 			}
 		}
 
-		if (SDL_GetTicks64() - lastTicks > 100)
+			if (SDL_GetTicks64() - lastTicks > 10)
 		{
 			// pull new frame
 			{
-				frameNumber++;
 				
-				
-				
-				//printf("Loaded %s\n", fileName);
-				img = stbi_load(fileName, &width, &height, &channels, 3);
-				printf("%04d.png, %d, %d\n", frameNumber, width, height);
 
 				Image raw;
 				Image processed;
+				
 
-				raw.width = width;
-				raw.height = height;
-				processed.width = width;
-				processed.height = height;
+				raw = loadImage(PATH, frameNumber);
+				printf("%04d.png, %d, %d\n", frameNumber, raw.width, raw.height);
+
+				processed.width = raw.width;
+				processed.height = raw.height;
 
 				initFrame(&processed);
 				zeroFrame(&processed);
 
-				copyFrame(img, &raw);
-
 				processFrame(raw, &processed);
 
-				texture.Set(width, height, processed.data);
-				stbi_image_free(img);
+				texture.Set(processed.width, processed.height, processed.data);
 
-				freeFrame(&raw);
+				freeImage(&raw);
 				freeFrame(&processed);
 
-				
+				frameNumber++;
 			}
 
 			lastTicks = SDL_GetTicks64();

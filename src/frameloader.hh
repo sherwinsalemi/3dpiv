@@ -1,4 +1,4 @@
 #include "cv.hh"
 
-Image loadImage(int frameNumber);
+Image loadImage(const char* path, int frameNumber);
 void freeImage(Image* image);

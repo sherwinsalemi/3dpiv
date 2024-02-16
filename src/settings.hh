@@ -3,4 +3,4 @@
 #define WIDTH 1920
 #define HEIGHT 1080
 
-#define PATH "res/%04d.png"
+#define PATH "res/sony120/%04d.png"
