@@ -16,6 +16,7 @@
 #include "cv.hh"
 #include "settings.hh"
 #include "frameloader.hh"
+#include "composite.hh"
 
 float vboData[] = {
 	-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
@@ -29,12 +30,6 @@ u32 iboData[] = {
 	0, 2, 3
 };
 
-float testArrowVBO[] = {
-	-1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
-	-1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-	1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-	1.0f, -1.0f, 1.0f, 1.0f, 1.0f
-};
 
 Renderer r;
 
@@ -88,6 +83,10 @@ int main()
 		(void*)(3*sizeof(float)));
 
 	initPipeline();
+
+
+	vector2 pixelPoint = thetaToCoord(-0.26f, 60.0f, 57.0f, 0.17f);
+	printf("Calc pos: %f, %f\n", pixelPoint.x, pixelPoint.y);
 	
 
 	int64_t lastTicks = -1;

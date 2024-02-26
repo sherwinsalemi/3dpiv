@@ -11,6 +11,8 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_events.h"
 
+#include <assert.h>
+
 char* LoadString(const char* path)
 {
 	FILE* f = fopen(path, "rb");
