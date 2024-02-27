@@ -1,7 +1,7 @@
 #include "render.hh"
 
-#include "core.hh"
-#include "settings.hh"
+#include "../core.hh"
+#include "../settings.hh"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,7 +154,12 @@ void Buffer::Bind()
 	}
 }
 
-Buffer CreateBuffer(u32 size, void *data, BufferFlags flags) {
+void Buffer::Update(u32 size, void* data)
+{
+	glNamedBufferSubData(this->gl_id, 0, size, data);	
+}
+
+Buffer CreateBuffer(u32 size, void* data, BufferFlags flags) {
 	Buffer buffer = {
 		.size = size,
 		.flags = flags
@@ -163,7 +168,7 @@ Buffer CreateBuffer(u32 size, void *data, BufferFlags flags) {
 
 	assert((flags & BUFFER_VERTEX) != 0 || (flags & BUFFER_INDEX) != 0);
 
-	glNamedBufferStorage(buffer.gl_id, size, data, 0);	
+	glNamedBufferStorage(buffer.gl_id, size, data, GL_DYNAMIC_STORAGE_BIT);	
 
 	return buffer;
 }

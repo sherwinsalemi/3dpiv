@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core.hh"
+#include "../core.hh"
 
 struct Image
 {

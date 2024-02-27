@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include "core.hh"
+#include "../core.hh"
 
 enum MouseButton
 {

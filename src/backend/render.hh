@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core.hh"
+#include "../core.hh"
 
 typedef struct SDL_Window SDL_Window;
 typedef void *SDL_GLContext;
@@ -48,6 +48,7 @@ struct Buffer {
 	u32         size;
 	BufferFlags flags;
 	void Bind();
+	void Update(u32 size, void* data);
 };
 
 Buffer CreateBuffer(u32 size, void* data, BufferFlags flags);

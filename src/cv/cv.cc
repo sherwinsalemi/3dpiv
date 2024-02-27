@@ -1,7 +1,6 @@
 #include "cv.hh"
 
-#include "core.hh"
-#include "settings.hh"
+#include "../settings.hh"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

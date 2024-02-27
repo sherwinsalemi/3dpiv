@@ -13,12 +13,16 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "core.hh"
-#include "render.hh"
-#include "cv.hh"
+#include "backend/render.hh"
+#include "cv/cv.hh"
 #include "settings.hh"
-#include "frameloader.hh"
-#include "composite.hh"
-#include "input.hh"
+#include "backend/frameloader.hh"
+#include "cv/compositor.hh"
+#include "backend/input.hh"
+
+#include "imgui.h"
+#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_opengl3.h"
 
 float vboData[] = {
 	-100.0f, -100.0f, 1.0f, 0.0f, 1.0f,
@@ -49,6 +53,13 @@ int main()
 {
 	InitRenderer(&r);
 	SDL_SetRelativeMouseMode((SDL_bool)true);
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& m_io = ImGui::GetIO(); (void)m_io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplSDL2_InitForOpenGL(r.window, r.context);
+	ImGui_ImplOpenGL3_Init();
 	
 	int frameNumber = 1;
 
@@ -109,6 +120,9 @@ int main()
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
+			if (!relativeMouse)
+			{ImGui_ImplSDL2_ProcessEvent(&e);}
+			
 			switch (e.type)
 			{
 			case SDL_QUIT:
@@ -162,8 +176,82 @@ int main()
 			}
 		}
 
-		if (SDL_GetTicks64() - lastTicks > 10)
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
+
+		//ImGui::ShowDemoWindow();
+		
+
+		ImGui::Begin("Controls");
+
+		bool frameStepped = ImGui::InputInt("Frame Number", &frameNumber);
+		if (frameNumber < 1)
+			frameNumber = 1;
+
+		static bool isPlaying = false;
+		if (isPlaying)
 		{
+			if (ImGui::Button("Pause"))
+			{
+				isPlaying = false;
+			}
+		}
+		else {
+			if (ImGui::Button("Play"))
+			{
+				isPlaying = true;
+			}
+		}
+
+
+		static int thetaRefFrame1 = 7;
+		static int thetaRefFrame2 = 1740;
+
+		static float thetaRef1 = 0.0f + 1.57f;
+		static float thetaRef2 = 207.345f + 1.57f;
+
+		ImGui::InputInt("Frame 1", &thetaRefFrame1);
+		if (ImGui::InputFloat("Theta 1", &thetaRef1))
+		{
+			thetaRefFrame1 = frameNumber;
+		}
+
+		ImGui::InputInt("Frame 2", &thetaRefFrame2);
+		if (ImGui::InputFloat("Theta 2", &thetaRef2))
+		{
+			thetaRefFrame2 = frameNumber;
+		}
+		
+		float theta = lineMap((float)thetaRefFrame1, thetaRef1, (float)thetaRefFrame2, thetaRef2, (float)frameNumber);
+		ImGui::InputFloat("Theta", &theta);
+		float thetaMod = fmod(theta, PI * 2);
+		ImGui::InputFloat("ThetaM", &thetaMod);
+
+		ImGui::End();
+
+
+		vector2 coordRight = thetaToCoord(degToRad(-45.0f), 60.0f, 57.0f, thetaMod);
+		vector2 coordLeft = thetaToCoord(degToRad(45.0f), 60.0f, 57.0f, thetaMod);
+
+		// vboData[0] = coordLeft.y;
+		// vboData[2] = coordLeft.x;
+
+		// vboData[5] = coordLeft.y;
+		// vboData[7] = coordLeft.x;
+
+		// vboData[10] = coordRight.y;
+		// vboData[12] = coordRight.x;
+
+		// vboData[15] = coordRight.y;
+		// vboData[17] = coordRight.x;
+
+		vbo.Update(sizeof(vboData), vboData);
+
+
+		if ((SDL_GetTicks64() - lastTicks > 10 && isPlaying) || (frameStepped))
+		{
+
 			// pull new frame
 			{
 				
@@ -171,8 +259,8 @@ int main()
 				Image raw;
 				Image processed;
 				
-
-				raw = loadImage(PATH, frameNumber);
+				
+				raw = loadImage(PATH, &frameNumber);
 				printf("%04d.png, %d, %d\n", frameNumber, raw.width, raw.height);
 
 				processed.width = raw.width;
@@ -188,7 +276,8 @@ int main()
 				freeImage(&raw);
 				freeFrame(&processed);
 
-				frameNumber++;
+				if (!frameStepped)
+					frameNumber++;
 			}
 
 			lastTicks = SDL_GetTicks64();
@@ -207,29 +296,32 @@ int main()
 
 		glm::vec4 movement {0.0, 0.0, 0.0, 0.0};
 
-		if (Input::KeyboardCheck(SDLK_w))
+		if (relativeMouse)
 		{
-			movement.z -= cameraMoveSpeed;
-		}
-		if (Input::KeyboardCheck(SDLK_a))
-		{
-			movement.x -= cameraMoveSpeed;
-		}
-		if (Input::KeyboardCheck(SDLK_s))
-		{
-			movement.z += cameraMoveSpeed;
-		}
-		if (Input::KeyboardCheck(SDLK_d))
-		{
-			movement.x += cameraMoveSpeed;
-		}
-		if (Input::KeyboardCheck(SDLK_LSHIFT))
-		{
-			movement.y -= cameraMoveSpeed;
-		}
-		if (Input::KeyboardCheck(SDLK_SPACE))
-		{
-			movement.y += cameraMoveSpeed;
+			if (Input::KeyboardCheck(SDLK_w))
+			{
+				movement.z -= cameraMoveSpeed;
+			}
+			if (Input::KeyboardCheck(SDLK_a))
+			{
+				movement.x -= cameraMoveSpeed;
+			}
+			if (Input::KeyboardCheck(SDLK_s))
+			{
+				movement.z += cameraMoveSpeed;
+			}
+			if (Input::KeyboardCheck(SDLK_d))
+			{
+				movement.x += cameraMoveSpeed;
+			}
+			if (Input::KeyboardCheck(SDLK_LSHIFT))
+			{
+				movement.y -= cameraMoveSpeed;
+			}
+			if (Input::KeyboardCheck(SDLK_SPACE))
+			{
+				movement.y += cameraMoveSpeed;
+			}
 		}
 
 		
@@ -277,17 +369,27 @@ int main()
 			&projection[0][0]
 		);
 
-		glClearColor(0.1, 0.1, 0.5, 1.0);
+		ImGui::Render();
+
+
+		
+		
+
+		glClearColor(0.1, 0.1, 0.1, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUniform1i(glGetUniformLocation(shader.gl_id, "uTexture"), 0);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		SDL_GL_SwapWindow(r.window);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		
+		SDL_GL_SwapWindow(r.window);
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 
 	FreeShader(&shader);
 	FreeRenderer(&r);
