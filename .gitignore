@@ -5,3 +5,4 @@ res/*
 *.avi
 bin/3dpiv
 bin/3dpiv.exe
+bin/imgui.ini
