@@ -11,6 +11,10 @@
 #include "SDL/SDL.h"
 #include "SDL/SDL_events.h"
 
+#include "imgui.h"
+#include "backends/imgui_impl_sdl2.h"
+#include "backends/imgui_impl_opengl3.h"
+
 #include <assert.h>
 
 char* LoadString(const char* path)
@@ -26,11 +30,8 @@ char* LoadString(const char* path)
 	return buf;
 }
 
-void InitRenderer(Renderer* r)
+void InitRenderer(Window* r)
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	r->window = SDL_CreateWindow("CV", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
-	
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 6 );
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY );
@@ -55,15 +56,48 @@ void InitRenderer(Renderer* r)
     glGetIntegerv(GL_MAJOR_VERSION, &maj);
     glGetIntegerv(GL_MINOR_VERSION, &min);
     SDL_Log("Context  : %d.%d", maj, min);
+
+
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& m_io = ImGui::GetIO(); (void)m_io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplSDL2_InitForOpenGL(r->window, r->context);
+	ImGui_ImplOpenGL3_Init();
+
+	u32 vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 }
 
-void FreeRenderer(Renderer* r)
+void SwapWindow(Window* r)
 {
-	
+	SDL_GL_SwapWindow(r->window);
+}
+
+void FreeRenderer(Window* r)
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 
 	SDL_GL_DeleteContext(r->context);
-	SDL_DestroyWindow(r->window);
-	SDL_Quit();
+}
+
+
+
+void GUIBeginFrame()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplSDL2_NewFrame();
+	ImGui::NewFrame();
+}
+
+void GUIRenderFrame()
+{
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 

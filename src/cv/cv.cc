@@ -5,18 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-void initFrame(Image* img)
+void InitFrame(Image* img)
 {
 	img->data = (unsigned char*)malloc(img->width*img->height*sizeof(char)*3);
-
-	if (img->width == 0)
-		img->width = WIDTH;
-
-	if (img->height == 0)
-		img->height = HEIGHT;
+	img->width = WIDTH;
+	img->height = HEIGHT;
 }
 
-void initFrame(Image* img, u32 width, u32 height)
+void InitFrame(Image* img, u32 width, u32 height)
 {
 	img->width = width;
 	img->height = height;
@@ -24,7 +20,7 @@ void initFrame(Image* img, u32 width, u32 height)
 	img->data = (unsigned char*)malloc(img->width*img->height*sizeof(char)*3);
 }
 
-void zeroFrame(Image* img)
+void ZeroFrame(Image* img)
 {
 	if (img->width == 0)
 		img->width = WIDTH;
@@ -35,7 +31,7 @@ void zeroFrame(Image* img)
 	memset(img->data, 0, img->width*img->height*sizeof(char)*3);
 }
 
-void copyFrame(Image* src, Image* dst, bool allocate)
+void CopyFrame(Image* src, Image* dst, bool allocate)
 {
 	dst->width = src->width;
 	dst->height = src->height;
@@ -46,7 +42,7 @@ void copyFrame(Image* src, Image* dst, bool allocate)
 	memcpy(dst->data, src->data, src->width*src->height*sizeof(char)*3);
 }
 
-void copyFrame(unsigned char* src, Image* dst, bool allocate)
+void CopyFrame(unsigned char* src, Image* dst, bool allocate)
 {
 	dst->width = WIDTH;
 	dst->height = HEIGHT;
@@ -57,7 +53,7 @@ void copyFrame(unsigned char* src, Image* dst, bool allocate)
 	memcpy(dst->data, src, dst->width*dst->height*sizeof(char)*3);
 }
 
-void freeFrame(Image* img)
+void FreeFrame(Image* img)
 {
 	free(img->data);
 }

@@ -7,7 +7,7 @@
 Notes:
 
 Camera points in the positive X direction
-0 radians theta is in the positive X direction
+0 radians theta points in the positive X direction
 Positive is counterclockwise, so angle increases from right to left in the image
 Forward and right are from the camera's perspective
 */
@@ -29,8 +29,8 @@ vector2 thetaToCoord(float cameraYawAngle, float laserPointRight, float laserPoi
 		return vec;
 	}
 
-	vec.x = (laserPointForward * tanf(laserAngle) + laserPointRight) / (tanf(laserAngle) - tanf(cameraYawAngle));
-	vec.y = tanf(cameraYawAngle) * vec.x;
+	vec.x = float((double)laserPointForward * tan((double)laserAngle) + (double)laserPointRight) / (tan((double)laserAngle) - tan((double)cameraYawAngle));
+	vec.y = tan(cameraYawAngle) * vec.x;
 	return vec;
 }
 

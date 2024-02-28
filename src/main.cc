@@ -21,8 +21,21 @@
 #include "backend/input.hh"
 
 #include "imgui.h"
-#include "backends/imgui_impl_sdl2.h"
-#include "backends/imgui_impl_opengl3.h"
+
+struct TexturedPlaneMesh
+{
+	vector3 DLvertex;
+	vector2 DLtexcoord;
+	
+	vector3 ULvertex;
+	vector2 ULtexcoord;
+
+	vector3 URvertex;
+	vector2 URtexcoord;
+
+	vector3 DRvertex;
+	vector2 DRtexcoord;
+};
 
 float vboData[] = {
 	-100.0f, -100.0f, 1.0f, 0.0f, 1.0f,
@@ -36,10 +49,7 @@ u32 iboData[] = {
 	0, 2, 3
 };
 
-
-Renderer r;
-
-bool relativeMouse = true;
+Window window;
 
 float cameraLookSpeed = 0.005f;
 float cameraMoveSpeed = 1.5f;
@@ -49,31 +59,17 @@ glm::vec3 cameraPos;
 float cameraPitch = 0.0f;
 float cameraYaw = 0.0f;
 
+bool running = true;
 int main()
 {
-	InitRenderer(&r);
-	SDL_SetRelativeMouseMode((SDL_bool)true);
-
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& m_io = ImGui::GetIO(); (void)m_io;
-	ImGui::StyleColorsDark();
-	ImGui_ImplSDL2_InitForOpenGL(r.window, r.context);
-	ImGui_ImplOpenGL3_Init();
+	InitWindow(&window);
+	InitRenderer(&window);
 	
 	int frameNumber = 1;
-
-	u32 vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
 	
 	Texture texture; // opengl texture
 	texture.Gen();
 	
-	
-	printf("1\n");
-
 	char* fragmentSource = LoadString("fragment.glsl");
 	char* vertexSource = LoadString("vertex.glsl");
 
@@ -106,83 +102,18 @@ int main()
 		5*sizeof(float),
 		(void*)(3*sizeof(float)));
 
-	initPipeline();
-
-
-	vector2 pixelPoint = thetaToCoord(-0.26f, 60.0f, 57.0f, 0.17f);
-	printf("Calc pos: %f, %f\n", pixelPoint.x, pixelPoint.y);
-	
+	InitPipeline();
 
 	int64_t lastTicks = -1;
-	bool running = true;
+
 	while (running)
 	{
-		SDL_Event e;
-		while (SDL_PollEvent(&e))
-		{
-			if (!relativeMouse)
-			{ImGui_ImplSDL2_ProcessEvent(&e);}
-			
-			switch (e.type)
-			{
-			case SDL_QUIT:
-			running = false;
-				break;
-			case SDL_KEYDOWN:
-				if (e.key.repeat == 0)
-				{
-					Input::SetKeyDown(e.key.keysym.sym);
-				}
-				else
-				{
-					Input::SetKeyDownRepeat(e.key.keysym.sym);
-				}
-				//Logger::Log(std::to_string((int)e.key.keysym.sym) + " pressed");
-				break;
-			case SDL_KEYUP:
-				Input::SetKeyUp(e.key.keysym.sym);
-				//Logger::Log(std::to_string((int)e.key.keysym.sym) + " released");
-				break;
-			case SDL_MOUSEMOTION:
-				MousePos mousePos;
+		UpdateWindowEvents(&window);
 
-				mousePos.x = e.motion.x;
-				mousePos.y = e.motion.y;
-				mousePos.relativeX = e.motion.xrel;
-				mousePos.relativeY = e.motion.yrel;
-
-				if (relativeMouse)//if (mouseRelative)
-				{
-					int x,y;
-					SDL_GetWindowSize(r.window, &x, &y);
-					SDL_WarpMouseInWindow(r.window, x/2, y/2);
-				} else {
-					mousePos.relativeX = 0;
-					mousePos.relativeY = 0;
-				}
-
-				Input::SetMouseMovement(mousePos);
-				
-
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				Input::SetMouseButton((MouseButton)e.button.button, true);
-
-				break;
-			case SDL_MOUSEBUTTONUP:
-				Input::SetMouseButton((MouseButton)e.button.button, false);
-				
-				break;
-			}
-		}
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
-		ImGui::NewFrame();
+		GUIBeginFrame();
 
 		//ImGui::ShowDemoWindow();
 		
-
 		ImGui::Begin("Controls");
 
 		bool frameStepped = ImGui::InputInt("Frame Number", &frameNumber);
@@ -225,7 +156,7 @@ int main()
 		
 		float theta = lineMap((float)thetaRefFrame1, thetaRef1, (float)thetaRefFrame2, thetaRef2, (float)frameNumber);
 		ImGui::InputFloat("Theta", &theta);
-		float thetaMod = fmod(theta, PI * 2);
+		float thetaMod = fmod(theta, PI * 2.0f);
 		ImGui::InputFloat("ThetaM", &thetaMod);
 
 		ImGui::End();
@@ -234,17 +165,17 @@ int main()
 		vector2 coordRight = thetaToCoord(degToRad(-45.0f), 60.0f, 57.0f, thetaMod);
 		vector2 coordLeft = thetaToCoord(degToRad(45.0f), 60.0f, 57.0f, thetaMod);
 
-		// vboData[0] = coordLeft.y;
-		// vboData[2] = coordLeft.x;
+		vboData[0] = coordLeft.y;
+		vboData[2] = coordLeft.x;
 
-		// vboData[5] = coordLeft.y;
-		// vboData[7] = coordLeft.x;
+		vboData[5] = coordLeft.y;
+		vboData[7] = coordLeft.x;
 
-		// vboData[10] = coordRight.y;
-		// vboData[12] = coordRight.x;
+		vboData[10] = coordRight.y;
+		vboData[12] = coordRight.x;
 
-		// vboData[15] = coordRight.y;
-		// vboData[17] = coordRight.x;
+		vboData[15] = coordRight.y;
+		vboData[17] = coordRight.x;
 
 		vbo.Update(sizeof(vboData), vboData);
 
@@ -266,15 +197,15 @@ int main()
 				processed.width = raw.width;
 				processed.height = raw.height;
 
-				initFrame(&processed);
-				zeroFrame(&processed);
+				InitFrame(&processed);
+				ZeroFrame(&processed);
 
-				processFrame(raw, &processed);
+				ProcessPipeline(raw, &processed);
 
 				texture.Set(processed.width, processed.height, processed.data);
 
 				freeImage(&raw);
-				freeFrame(&processed);
+				FreeFrame(&processed);
 
 				if (!frameStepped)
 					frameNumber++;
@@ -296,7 +227,7 @@ int main()
 
 		glm::vec4 movement {0.0, 0.0, 0.0, 0.0};
 
-		if (relativeMouse)
+		if (window.relativeMouse)
 		{
 			if (Input::KeyboardCheck(SDLK_w))
 			{
@@ -336,13 +267,7 @@ int main()
 		cameraPos.y += movement.y;
 		cameraPos.z += movement.z;
 
-		if (Input::KeyboardCheckPressed(SDLK_ESCAPE))
-		{
-			SDL_SetRelativeMouseMode((SDL_bool)!SDL_GetRelativeMouseMode());
-			relativeMouse = SDL_GetRelativeMouseMode();
-		}
-
-		Input::Update();
+		
 
 		
 
@@ -369,10 +294,6 @@ int main()
 			&projection[0][0]
 		);
 
-		ImGui::Render();
-
-
-		
 		
 
 		glClearColor(0.1, 0.1, 0.1, 1.0);
@@ -382,19 +303,17 @@ int main()
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		GUIRenderFrame();
 
-		SDL_GL_SwapWindow(r.window);
+		SwapWindow(&window);
 	}
 
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
+	
 
 	FreeShader(&shader);
-	FreeRenderer(&r);
-
-	freePipeline();
+	FreeRenderer(&window);
+	FreeWindow(&window);
+	FreePipeline();
 	
     return 0;
 }

@@ -6,20 +6,26 @@
 
 Image last;
 
-void initPipeline()
+void InitPipeline()
 {
 	last.width = WIDTH;
 	last.height = HEIGHT;
-	initFrame(&last);
-	zeroFrame(&last);
+	InitFrame(&last);
+	ZeroFrame(&last);
 }
 
-void processFrame(Image in, Image* out)
+void ProcessPipeline(Image in, Image* out)
 {
-	copyFrame(&in, out, false);
+	for (u32 x = 0; x < WIDTH; x++)
+	{
+		for (u32 y = 0; y < HEIGHT; y++)
+		{
+			pix((*out), x, y, RED) = pix(in, x, y, RED) * 2;
+		}
+	}
 }
 
-void freePipeline()
+void FreePipeline()
 {
-	freeFrame(&last);
+	FreeFrame(&last);
 }

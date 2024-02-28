@@ -8,16 +8,16 @@ struct Image
 	unsigned char* data; // RGB format
 };
 
-void initFrame(Image* img);
-void initFrame(Image* img, u32 width, u32 height);
-void zeroFrame(Image* img);
-void copyFrame(Image* src, Image* dst, bool allocate = true);
-void copyFrame(unsigned char* src, Image* dst, bool allocate = true);
-void freeFrame(Image* img);
+void InitFrame(Image* img);
+void InitFrame(Image* img, u32 width, u32 height);
+void ZeroFrame(Image* img);
+void CopyFrame(Image* src, Image* dst, bool allocate = true);
+void CopyFrame(unsigned char* src, Image* dst, bool allocate = true);
+void FreeFrame(Image* img);
 
-void initPipeline();
-void processFrame(Image in, Image* out);
-void freePipeline();
+void InitPipeline();
+void ProcessPipeline(Image in, Image* out);
+void FreePipeline();
 
 #define RED 0
 #define GRN 1

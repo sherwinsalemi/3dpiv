@@ -2,22 +2,16 @@
 
 #include "../core.hh"
 
-typedef struct SDL_Window SDL_Window;
-typedef void *SDL_GLContext;
+#include "window.hh"
 
 char* LoadString(const char* path);
 
-void InitRender(SDL_Window* window, SDL_GLContext context, int width, int height);
-void FreeRender(SDL_Window* window, SDL_GLContext context);
+void InitRenderer(Window* r);
+void SwapWindow(Window* r);
+void FreeRenderer(Window* r);
 
-struct Renderer
-{
-	SDL_Window* window;
-	SDL_GLContext context;
-};
-
-void InitRenderer(Renderer* r);
-void FreeRenderer(Renderer* r);
+void GUIBeginFrame();
+void GUIRenderFrame();
 
 enum ShaderType
 {
