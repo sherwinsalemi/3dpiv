@@ -186,6 +186,7 @@ int main()
 
 	for (int i = 0; i < 20; i++)
 	{
+		printf("Loop %d start\n", i);
 		int iFrame = 2 + i;
 		float theta = lineMap((float)thetaRefFrame1, thetaRef1, (float)thetaRefFrame2, thetaRef2, (float)iFrame);
 		float thetaMod = fmod(theta, PI * 2.0f);
@@ -193,24 +194,36 @@ int main()
 		vector2 coordRight = thetaToCoord(degToRad(-45.0f), 60.0f, 57.0f, thetaMod);
 		vector2 coordLeft = thetaToCoord(degToRad(45.0f), 60.0f, 57.0f, thetaMod);
 		
-		planes[i] = loadImage(PATH, &iFrame);
-		printf("%d, theta %f\n", iFrame, thetaMod);
+		printf("loading img\n");
+		Image raw = loadImage(PATH, &iFrame);
 
-		
+		printf("Frame setup\n");
+		planes[i].width = WIDTH;
+		planes[i].width = HEIGHT;
+		InitFrame(&planes[i]);
+		printf("Zero frame\n");
+
+		printf("Run pipeline\n");
+		ProcessPipeline(raw, &planes[i]);
+		freeImage(&raw);
+
+
+		printf("Form buffer\n");
 		bufferData[i] = {
-			coordLeft.y, -100.0f, coordLeft.x, 0.0f, 1.0f,
-			coordLeft.y, 100.0f, coordLeft.x, 0.0f, 0.0f,
-			coordRight.y, 100.0f, coordRight.x, 1.0f, 0.0f,
-			coordRight.y, -100.0f, coordRight.x, 1.0f, 1.0f
+			coordLeft.y, -30.0f, coordLeft.x, 0.0f, 1.0f,
+			coordLeft.y, 30.0f, coordLeft.x, 0.0f, 0.0f,
+			coordRight.y, 30.0f, coordRight.x, 1.0f, 0.0f,
+			coordRight.y, -30.0f, coordRight.x, 1.0f, 1.0f
 		};
 		
 
 		//printf("%f, %f, %f\n", ((float*)&bufferData[i])[0], ((float*)&bufferData[i])[1],((float*)&bufferData[i])[2]);
 
 		//buffer[i] = CreateBuffer(sizeof(TexturedPlaneMesh), (float*)&bufferData[i], BUFFER_VERTEX);
+		printf("Create buffer\n");
 		buffer[i] = CreateBuffer(sizeof(vboData), &bufferData[i], BUFFER_VERTEX);
 		
-		printf("Bufcreate\n");
+		printf("Done\n");
 
 		GLenum err;
 		while((err = glGetError()) != GL_NO_ERROR)
