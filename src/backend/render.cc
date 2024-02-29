@@ -17,6 +17,8 @@
 
 #include <assert.h>
 
+u32 vao;
+
 char* LoadString(const char* path)
 {
 	FILE* f = fopen(path, "rb");
@@ -66,7 +68,7 @@ void InitRenderer(Window* r)
 	ImGui_ImplSDL2_InitForOpenGL(r->window, r->context);
 	ImGui_ImplOpenGL3_Init();
 
-	u32 vao;
+	
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 }
@@ -178,6 +180,7 @@ void Buffer::Bind()
 	{
 	case BUFFER_VERTEX:
 		glBindBuffer(GL_ARRAY_BUFFER, this->gl_id);
+		printf("Vertex bound %u\n", this->gl_id);
 		break;
 	case BUFFER_INDEX:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->gl_id);
@@ -199,6 +202,8 @@ Buffer CreateBuffer(u32 size, void* data, BufferFlags flags) {
 		.flags = flags
 	};
 	glCreateBuffers(1, &buffer.gl_id);
+
+	printf("%u ID created\n", buffer.gl_id);
 
 	assert((flags & BUFFER_VERTEX) != 0 || (flags & BUFFER_INDEX) != 0);
 
