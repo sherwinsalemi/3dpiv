@@ -62,9 +62,11 @@ int main()
 
 	int frameNumber = 1;
 
-	int width,height,channels;
+	int width;
+	int height;
+	int channels;
 	char fileName[32];
-	unsigned char* img;
+	
 
 	
 
@@ -72,11 +74,8 @@ int main()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	img = stbi_load("res/0001.png", &width, &height, &channels, 3);
 	Texture texture;
 	texture.Gen();
-	texture.Set(width, height, img);
-	stbi_image_free(img);
 
 	char* fragmentSource = LoadString("fragment.glsl");
 	char* vertexSource = LoadString("vertex.glsl");
@@ -112,7 +111,69 @@ int main()
 
 	initPipeline();
 
-	int64_t lastTicks = -5000;
+
+
+	//printf("Loaded %s\n", fileName);
+	
+
+	Image t0f0;
+	Image t0f1;
+	Image t0f2;
+	Image t1f0;
+	Image t1f1;
+	Image t1f2;
+
+	Image processed;
+	
+	t0f0.data = stbi_load("res/0054.png", &width, &height, &channels, 3);
+	t0f1.data = stbi_load("res/0055.png", &width, &height, &channels, 3);
+	t0f2.data = stbi_load("res/0056.png", &width, &height, &channels, 3);
+	t1f0.data = stbi_load("res/0106.png", &width, &height, &channels, 3);
+	t1f1.data = stbi_load("res/0107.png", &width, &height, &channels, 3);
+	t1f2.data = stbi_load("res/0108.png", &width, &height, &channels, 3);
+
+	t0f0.width = width;
+	t0f0.height = height;
+	t0f1.width = width;
+	t0f1.height = height;
+	t0f2.width = width;
+	t0f2.height = height;
+	
+	t1f0.width = width;
+	t1f0.height = height;
+	t1f1.width = width;
+	t1f1.height = height;
+	t1f2.width = width;
+	t1f2.height = height;
+
+	processed.width = width;
+	processed.height = height;
+
+	printf("Allocating frames\n");
+
+	initFrame(&processed);
+	zeroFrame(&processed);
+
+	printf("Running pipelines\n");
+	processFrame(t0f0, t0f1, t0f2, t1f0, t1f1, t1f2, &processed);
+
+	texture.Set(width, height, processed.data);
+
+	stbi_image_free(t0f0.data);
+	stbi_image_free(t0f1.data);
+	stbi_image_free(t0f2.data);
+	stbi_image_free(t1f0.data);
+	stbi_image_free(t1f1.data);
+	stbi_image_free(t1f2.data);
+
+	
+	freeFrame(&processed);
+
+	//printf("%d, %d, %d\n", width,height,channels);
+
+	frameNumber++;
+
+
 	bool running = true;
 	while (running)
 	{
@@ -125,43 +186,7 @@ int main()
 			running = false;
 				break;
 			}
-		}
-
-		if (SDL_GetTicks64() - lastTicks > 10)
-		{
-			{
-				sprintf(fileName, "res/%04d.png", frameNumber);
-				//printf("Loaded %s\n", fileName);
-				img = stbi_load(fileName, &width, &height, &channels, 3);
-
-				Image raw;
-				Image processed;
-
-				raw.width = width;
-				raw.height = height;
-				processed.width = width;
-				processed.height = height;
-
-				initFrame(&processed);
-				zeroFrame(&processed);
-
-				copyFrame(img, &raw);
-
-				processFrame(raw, &processed);
-
-				texture.Set(width, height, processed.data);
-				stbi_image_free(img);
-
-				freeFrame(&raw);
-				freeFrame(&processed);
-
-				//printf("%d, %d, %d\n", width,height,channels);
-
-				frameNumber++;
-			}
-
-			lastTicks = SDL_GetTicks64();
-		}
+		}	
 
 		shader.Bind();
 
@@ -176,7 +201,6 @@ int main()
 	}
 
 	freePipeline();
-
 
 	FreeShader(&shader);
 

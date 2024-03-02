@@ -16,7 +16,7 @@ void copyFrame(unsigned char* src, Image* dst, bool allocate = true);
 void freeFrame(Image* img);
 
 void initPipeline();
-void processFrame(Image in, Image* out);
+void processFrame(Image t0f0, Image t0f1, Image t0f2, Image t1f0, Image t1f1, Image t1f2, Image* out);
 void freePipeline();
 
 #define RED 0

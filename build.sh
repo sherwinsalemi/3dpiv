@@ -1,7 +1,7 @@
 mkdir -p bin
 
 # if [ $OSTYPE == "msys" ]; then
-if clang++ src/*.cc src/*.c -Iinc -Llib -lSDL2 -obin/3dpiv.exe -Wno-deprecated; then 
+if clang++ src/*.cc src/*.c -Iinc -Llib -lSDL2 -obin/3depiv.exe -Wno-deprecated; then 
 	echo "Build succeeded";
 	exit 0;
 else 
