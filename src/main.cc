@@ -153,11 +153,18 @@ int main()
 		{
 			thetaRefFrame2 = frameNumber;
 		}
+
+
+		static float thetaOffset = 0.0f;
+		ImGui::InputFloat("Theta Offset", &thetaOffset);
 		
 		float theta = lineMap((float)thetaRefFrame1, thetaRef1, (float)thetaRefFrame2, thetaRef2, (float)frameNumber);
 		ImGui::InputFloat("Theta", &theta);
-		float thetaMod = fmod(theta, PI * 2.0f);
+		float thetaMod = fmod(theta, PI * 2.0f / 5.0f);
 		ImGui::InputFloat("ThetaM", &thetaMod);
+
+		static float camRight = 60.0f;
+		static float camForward = 57.0f;
 
 		ImGui::End();
 

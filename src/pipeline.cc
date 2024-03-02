@@ -20,7 +20,7 @@ void ProcessPipeline(Image in, Image* out)
 	{
 		for (u32 y = 0; y < HEIGHT; y++)
 		{
-			pix((*out), x, y, RED) = pix(in, x, y, RED) * 2;
+			pix((*out), x, y, RED) = pix(in, x, y, RED);
 		}
 	}
 }
