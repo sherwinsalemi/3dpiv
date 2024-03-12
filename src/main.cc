@@ -160,17 +160,19 @@ int main()
 		
 		float theta = lineMap((float)thetaRefFrame1, thetaRef1, (float)thetaRefFrame2, thetaRef2, (float)frameNumber);
 		ImGui::InputFloat("Theta", &theta);
-		float thetaMod = fmod(theta, PI * 2.0f / 5.0f);
+		float thetaMod = fmod(theta, PI * 2.0f / 5.0f) + thetaOffset;
 		ImGui::InputFloat("ThetaM", &thetaMod);
 
 		static float camRight = 60.0f;
 		static float camForward = 57.0f;
+		ImGui::InputFloat("Right", &camRight);
+		ImGui::InputFloat("Forward", &camForward);
 
 		ImGui::End();
 
 
-		vector2 coordRight = thetaToCoord(degToRad(-45.0f), 60.0f, 57.0f, thetaMod);
-		vector2 coordLeft = thetaToCoord(degToRad(45.0f), 60.0f, 57.0f, thetaMod);
+		vector2 coordRight = thetaToCoord(degToRad(-30.0f), camRight, camForward, thetaMod);
+		vector2 coordLeft = thetaToCoord(degToRad(30.0f), camRight, camForward, thetaMod);
 
 		vboData[0] = coordLeft.y;
 		vboData[2] = coordLeft.x;
